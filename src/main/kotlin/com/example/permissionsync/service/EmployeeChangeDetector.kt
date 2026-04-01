@@ -31,9 +31,25 @@ class EmployeeChangeDetector(
         log.info("Detected {} changed employee row(s)", changed.size)
         changed.forEach { emp ->
             log.debug("Changed: EMPLY_NO={} SECRTY_GRADE={} IF_DATE={}", emp.emplyNo, emp.secrtyGrade, emp.ifDate)
+            applyGradeConditions(emp)
         }
 
         lastSyncedAt = checkpoint
         return changed
+    }
+
+    private fun applyGradeConditions(employee: Employee) {
+        val gradeDigit = employee.secrtyGrade.getOrNull(1)?.digitToIntOrNull() ?: return
+
+        if (gradeDigit > 2) functionX(employee)
+        if (gradeDigit > 7) functionY(employee)
+    }
+
+    private fun functionX(employee: Employee) {
+        // TODO: implement function X
+    }
+
+    private fun functionY(employee: Employee) {
+        // TODO: implement function Y
     }
 }
