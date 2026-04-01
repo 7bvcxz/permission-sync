@@ -15,18 +15,23 @@ class PermissionSyncScheduler(
 
     @Scheduled(fixedRate = 20 * 60 * 1000) // every 20 minutes
     fun syncPermissions() {
-        log.info("Starting permission sync...")
+        log.info("=== Permission sync started ===")
 
-        val permissions = permissionRepository.findByIsActiveTrue()
-        log.info("Loaded {} active permissions from DB", permissions.size)
+        try {
+            log.debug("Reading active permissions from DB")
+            val permissions = permissionRepository.findByIsActiveTrue()
+            log.info("Loaded {} active permission(s) from DB", permissions.size)
 
-        // TODO: add your sync logic here
-        permissions.forEach { permission ->
-            log.debug("Syncing permission: {} -> {} on {}", permission.name, permission.action, permission.resource)
+            // TODO: add your sync logic here
+            permissions.forEach { permission ->
+                log.debug("Syncing permission: {} -> {} on {}", permission.name, permission.action, permission.resource)
+            }
+
+            employeeChangeDetector.detectChanges()
+
+            log.info("=== Permission sync completed successfully ===")
+        } catch (e: Exception) {
+            log.error("Permission sync failed with exception: {}", e.message, e)
         }
-
-        employeeChangeDetector.detectChanges()
-
-        log.info("Permission sync complete.")
     }
 }
