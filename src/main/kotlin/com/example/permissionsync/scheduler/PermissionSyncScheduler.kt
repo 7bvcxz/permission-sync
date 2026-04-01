@@ -1,13 +1,15 @@
 package com.example.permissionsync.scheduler
 
 import com.example.permissionsync.repository.PermissionRepository
+import com.example.permissionsync.service.EmployeeChangeDetector
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 
 @Component
 class PermissionSyncScheduler(
-    private val permissionRepository: PermissionRepository
+    private val permissionRepository: PermissionRepository,
+    private val employeeChangeDetector: EmployeeChangeDetector
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
@@ -22,6 +24,8 @@ class PermissionSyncScheduler(
         permissions.forEach { permission ->
             log.debug("Syncing permission: {} -> {} on {}", permission.name, permission.action, permission.resource)
         }
+
+        employeeChangeDetector.detectChanges()
 
         log.info("Permission sync complete.")
     }
