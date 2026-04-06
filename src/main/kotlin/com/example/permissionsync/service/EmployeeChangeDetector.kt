@@ -5,7 +5,6 @@ import com.example.permissionsync.model.Employee
 import com.example.permissionsync.repository.EmployeeRepository
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
 
 @Service
 class EmployeeChangeDetector(
@@ -14,41 +13,39 @@ class EmployeeChangeDetector(
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
-    // Tracks the IF_DATE watermark from the last successful detection run.
-    // null on first run → loads all rows as the initial baseline.
-    private var lastSyncedAt: LocalDateTime? = null
+    // In-memory snapshot of the last known SECRTY_GRADE per employee, keyed by EMPLY_NO.
+    // Populated on first run; updated after every run.
+    // Limitation: cleared on application restart — all rows are treated as changed on first run.
+    private val snapshot: MutableMap<String, String> = mutableMapOf()
 
     fun detectChanges(): List<Employee> {
-        val since = lastSyncedAt
-        val checkpoint = LocalDateTime.now()
-
-        val changed = try {
-            if (since == null) {
-                log.info("First run — reading all employees from DB as baseline")
-                val rows = employeeRepository.findAll()
-                log.info("Baseline load complete: {} employee row(s) read", rows.size)
-                rows
-            } else {
-                log.debug("Reading changed employees from DB (IF_DATE after {})", since)
-                val rows = employeeRepository.findByIfDateAfter(since)
-                log.info("DB read complete: {} changed employee row(s) detected since {}", rows.size, since)
-                rows
-            }
+        log.debug("Reading all employees from DB (dbo.IF_DIMS_FOR_SECRTY)")
+        val current = try {
+            employeeRepository.findAll()
         } catch (e: Exception) {
             log.error("Failed to read employee data from DB: {}", e.message, e)
             return emptyList()
+        }
+        log.info("DB read complete: {} employee row(s) loaded", current.size)
+
+        val changed = current.filter { emp ->
+            val previous = snapshot[emp.emplyNo]
+            previous == null || previous != emp.secrtyGrade
         }
 
         if (changed.isEmpty()) {
             log.info("No employee changes detected — skipping condition evaluation")
         } else {
+            log.info("Detected {} changed employee row(s)", changed.size)
             changed.forEach { emp ->
                 log.debug("Processing changed row: EMPLY_NO={} SECRTY_GRADE={} IF_DATE={}", emp.emplyNo, emp.secrtyGrade, emp.ifDate)
                 applyGradeConditions(emp)
             }
         }
 
-        lastSyncedAt = checkpoint
+        // Update snapshot with current state after processing
+        current.forEach { emp -> snapshot[emp.emplyNo] = emp.secrtyGrade }
+
         return changed
     }
 
@@ -63,7 +60,7 @@ class EmployeeChangeDetector(
 
         log.debug("EMPLY_NO={} SECRTY_GRADE='{}' grade digit={}", employee.emplyNo, raw, gradeDigit)
 
-        // CreateUser / GrantPoweruser are external REST API calls (see SecurityApiClient),
+        // CreateUser and GrantPoweruser are external REST API calls (see SecurityApiClient),
         // not DB writes. Each call is isolated so a failure of one does not block the other.
         if (gradeDigit > 2) {
             log.info("EMPLY_NO={} grade digit {} > 2 — calling CreateUser (REST)", employee.emplyNo, gradeDigit)
