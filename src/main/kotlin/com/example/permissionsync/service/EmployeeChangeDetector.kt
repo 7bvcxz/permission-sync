@@ -1,5 +1,6 @@
 package com.example.permissionsync.service
 
+import com.example.permissionsync.client.SecurityApiClient
 import com.example.permissionsync.model.Employee
 import com.example.permissionsync.repository.EmployeeRepository
 import org.slf4j.LoggerFactory
@@ -8,7 +9,8 @@ import java.time.LocalDateTime
 
 @Service
 class EmployeeChangeDetector(
-    private val employeeRepository: EmployeeRepository
+    private val employeeRepository: EmployeeRepository,
+    private val securityApiClient: SecurityApiClient
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
@@ -61,32 +63,26 @@ class EmployeeChangeDetector(
 
         log.debug("EMPLY_NO={} SECRTY_GRADE='{}' grade digit={}", employee.emplyNo, raw, gradeDigit)
 
+        // CreateUser / GrantPoweruser are external REST API calls (see SecurityApiClient),
+        // not DB writes. Each call is isolated so a failure of one does not block the other.
         if (gradeDigit > 2) {
-            log.info("EMPLY_NO={} grade digit {} > 2 — calling functionX", employee.emplyNo, gradeDigit)
+            log.info("EMPLY_NO={} grade digit {} > 2 — calling CreateUser (REST)", employee.emplyNo, gradeDigit)
             try {
-                functionX(employee)
-                log.debug("functionX completed for EMPLY_NO={}", employee.emplyNo)
+                securityApiClient.createUser(employee)
+                log.debug("CreateUser completed for EMPLY_NO={}", employee.emplyNo)
             } catch (e: Exception) {
-                log.error("functionX failed for EMPLY_NO={}: {}", employee.emplyNo, e.message, e)
+                log.error("CreateUser failed for EMPLY_NO={}: {}", employee.emplyNo, e.message, e)
             }
         }
 
         if (gradeDigit > 7) {
-            log.info("EMPLY_NO={} grade digit {} > 7 — calling functionY", employee.emplyNo, gradeDigit)
+            log.info("EMPLY_NO={} grade digit {} > 7 — calling GrantPoweruser (REST)", employee.emplyNo, gradeDigit)
             try {
-                functionY(employee)
-                log.debug("functionY completed for EMPLY_NO={}", employee.emplyNo)
+                securityApiClient.grantPoweruser(employee)
+                log.debug("GrantPoweruser completed for EMPLY_NO={}", employee.emplyNo)
             } catch (e: Exception) {
-                log.error("functionY failed for EMPLY_NO={}: {}", employee.emplyNo, e.message, e)
+                log.error("GrantPoweruser failed for EMPLY_NO={}: {}", employee.emplyNo, e.message, e)
             }
         }
-    }
-
-    private fun functionX(employee: Employee) {
-        // TODO: implement function X
-    }
-
-    private fun functionY(employee: Employee) {
-        // TODO: implement function Y
     }
 }

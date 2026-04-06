@@ -4,7 +4,7 @@ import jakarta.persistence.*
 import java.time.LocalDateTime
 
 @Entity
-@Table(name = "TABLE_A")
+@Table(name = "IF_DIMS_FOR_SECRTY", schema = "dbo")
 data class Employee(
     @Id
     @Column(name = "EMPLY_NO", nullable = false)
