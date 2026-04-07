@@ -7,3 +7,7 @@ spring:
     username: prod_user
     password: prod_secret
     driver-class-name: org.postgresql.Driver
+
+# 외부 User API 서버 주소 (PROD)
+user-api:
+  base-url: https://api.prod-server.com

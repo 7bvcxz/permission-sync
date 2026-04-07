@@ -7,3 +7,7 @@ spring:
     username: postgres
     password: secret
     driver-class-name: org.postgresql.Driver
+
+# 외부 User API 서버 주소 (DEV)
+user-api:
+  base-url: http://localhost:8081

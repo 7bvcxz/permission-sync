@@ -7,3 +7,7 @@ spring:
     username: qa_user
     password: qa_secret
     driver-class-name: org.postgresql.Driver
+
+# 외부 User API 서버 주소 (QA)
+user-api:
+  base-url: http://qa-api-server:8080
