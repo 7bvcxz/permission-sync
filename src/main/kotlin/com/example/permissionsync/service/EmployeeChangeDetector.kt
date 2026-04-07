@@ -13,13 +13,12 @@ class EmployeeChangeDetector(
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
-    // In-memory snapshot of the last known SECRTY_GRADE per employee, keyed by EMPLY_NO.
-    // Populated on first run; updated after every run.
-    // Limitation: cleared on application restart — all rows are treated as changed on first run.
+    // 직전 실행 시점의 SECRTY_GRADE 값을 EMPLY_NO 기준으로 메모리에 보관
+    // 앱 재시작 시 초기화되며, 첫 실행에서는 모든 행이 변경된 것으로 처리됨
     private val snapshot: MutableMap<String, String> = mutableMapOf()
 
     fun detectChanges(): List<Employee> {
-        log.debug("Reading all employees from DB (dbo.IF_DIMS_FOR_SECRTY)")
+        // dbo.IF_DIMS_FOR_SECRTY 전체 조회 (DB는 읽기 전용으로만 사용)
         val current = try {
             employeeRepository.findAll()
         } catch (e: Exception) {
@@ -28,6 +27,7 @@ class EmployeeChangeDetector(
         }
         log.info("DB read complete: {} employee row(s) loaded", current.size)
 
+        // snapshot과 비교하여 SECRTY_GRADE가 바뀐 행만 추출
         val changed = current.filter { emp ->
             val previous = snapshot[emp.emplyNo]
             previous == null || previous != emp.secrtyGrade
@@ -43,7 +43,7 @@ class EmployeeChangeDetector(
             }
         }
 
-        // Update snapshot with current state after processing
+        // 처리 완료 후 현재 상태를 snapshot에 저장 (다음 실행의 비교 기준)
         current.forEach { emp -> snapshot[emp.emplyNo] = emp.secrtyGrade }
 
         return changed
@@ -51,6 +51,7 @@ class EmployeeChangeDetector(
 
     private fun applyGradeConditions(employee: Employee) {
         val raw = employee.secrtyGrade
+        // SECRTY_GRADE의 2번째 글자를 숫자로 변환 (없거나 숫자가 아니면 skip)
         val gradeDigit = raw.getOrNull(1)?.digitToIntOrNull()
 
         if (gradeDigit == null) {
@@ -60,9 +61,9 @@ class EmployeeChangeDetector(
 
         log.debug("EMPLY_NO={} SECRTY_GRADE='{}' grade digit={}", employee.emplyNo, raw, gradeDigit)
 
-        // CreateUser and GrantPoweruser are external REST API calls (see SecurityApiClient),
-        // not DB writes. Each call is isolated so a failure of one does not block the other.
+        // 외부 REST API 호출 (DB write 아님). 각각 독립적으로 try/catch 처리
         if (gradeDigit > 2) {
+            // 2 초과 → 외부 API로 사용자 계정 생성 요청
             log.info("EMPLY_NO={} grade digit {} > 2 — calling CreateUser (REST)", employee.emplyNo, gradeDigit)
             try {
                 securityApiClient.createUser(employee)
@@ -73,6 +74,7 @@ class EmployeeChangeDetector(
         }
 
         if (gradeDigit > 7) {
+            // 7 초과 → 외부 API로 파워유저 권한 부여 요청
             log.info("EMPLY_NO={} grade digit {} > 7 — calling GrantPoweruser (REST)", employee.emplyNo, gradeDigit)
             try {
                 securityApiClient.grantPoweruser(employee)
