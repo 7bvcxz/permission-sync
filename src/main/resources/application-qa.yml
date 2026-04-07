@@ -1,0 +1,9 @@
+# QA 환경 - 테스트 및 검증용 DB
+# 실행: --spring.profiles.active=qa
+
+spring:
+  datasource:
+    url: jdbc:postgresql://qa-db-server:5432/permissionsdb_qa
+    username: qa_user
+    password: qa_secret
+    driver-class-name: org.postgresql.Driver

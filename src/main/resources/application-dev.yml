@@ -1,0 +1,9 @@
+# DEV 환경 - 개발자 로컬 또는 개발 서버용 DB
+# 실행: --spring.profiles.active=dev
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/permissionsdb_dev
+    username: postgres
+    password: secret
+    driver-class-name: org.postgresql.Driver

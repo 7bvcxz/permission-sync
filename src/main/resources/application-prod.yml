@@ -1,0 +1,9 @@
+# PROD 환경 - 운영 서버용 DB
+# 실행: --spring.profiles.active=prod
+
+spring:
+  datasource:
+    url: jdbc:postgresql://prod-db-server:5432/permissionsdb_prod
+    username: prod_user
+    password: prod_secret
+    driver-class-name: org.postgresql.Driver
