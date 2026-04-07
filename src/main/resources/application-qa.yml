@@ -1,0 +1,13 @@
+# QA 환경 - 테스트 및 검증용 설정
+# 민감값은 ENC(...) 암호화 문자열로 저장됨 — 복호화 키: APP_SECRET_KEY 환경변수
+# 실행: export APP_SECRET_KEY=... && java -jar app.jar --spring.profiles.active=qa
+
+spring:
+  datasource:
+    url: jdbc:postgresql://qa-db-server:5432/permissionsdb_qa
+    username: ENC(e9zEzYVNQ9N4vCMTNQWM7vdsfpOZuijvnXp+ESqRGor8O5xGekpe2f7JDpl0Vtwe)
+    password: ENC(llVGpSwa/x5Rz/p9qQtAyDhLq+53cIk8kNh3hOzC1qlWhvmFCnCcC6Wwto6v9zdB)
+    driver-class-name: org.postgresql.Driver
+
+user-api:
+  base-url: http://qa-api-server:8080

@@ -1,0 +1,13 @@
+# DEV 환경 - 개발 서버용 설정
+# 민감값은 ENC(...) 암호화 문자열로 저장됨 — 복호화 키: APP_SECRET_KEY 환경변수
+# 실행: export APP_SECRET_KEY=... && java -jar app.jar --spring.profiles.active=dev
+
+spring:
+  datasource:
+    url: jdbc:postgresql://dev-db-server:5432/permissionsdb_dev
+    username: ENC(wyUgsNYRvyFbOAwh3QXhefzsojB4IAupYFMqfjic1lh5cBadUCJLFT0ZPnoRSc3f)
+    password: ENC(Z0PtJtSbHuUsFDQxd8Mezbuf+v15ecWVRzVBLAoEEqlV0PLLE2Fb0eZOQcRL8zRD)
+    driver-class-name: org.postgresql.Driver
+
+user-api:
+  base-url: http://dev-api-server:8080

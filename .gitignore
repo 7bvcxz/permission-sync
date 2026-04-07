@@ -1,6 +1,3 @@
-# Git에 올라가지 않아야 하는 환경별 설정 파일
-# 각자 로컬에서 application-example.yml 을 참고해 직접 만들어 사용
+# 로컬 개발 환경 설정 파일 — 각 개발자가 직접 생성해 사용
+# 민감한 실제 값(DB 비밀번호 등)이 들어있으므로 Git에 올리지 않음
 src/main/resources/application-local.yml
-src/main/resources/application-dev.yml
-src/main/resources/application-qa.yml
-src/main/resources/application-prod.yml

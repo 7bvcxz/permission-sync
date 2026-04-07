@@ -1,0 +1,13 @@
+# PROD 환경 - 운영 서버용 설정
+# 민감값은 ENC(...) 암호화 문자열로 저장됨 — 복호화 키: APP_SECRET_KEY 환경변수
+# 실행: export APP_SECRET_KEY=... && java -jar app.jar --spring.profiles.active=prod
+
+spring:
+  datasource:
+    url: jdbc:postgresql://prod-db-server:5432/permissionsdb_prod
+    username: ENC(7zm8JHWtJKDQahuLm+46NW1wciHllmi5zytcbJshO51V1CZVaK1ywX223BGFpwEC)
+    password: ENC(cZP2PQdtGy1J0iONpRhnuuSC1n/0S11tDgj2DnevuA8gPd7GUnyMO016SbNB3kKp)
+    driver-class-name: org.postgresql.Driver
+
+user-api:
+  base-url: https://api.prod-server.com
