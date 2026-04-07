@@ -1,6 +1,12 @@
-# 공통 설정 파일 - 모든 환경에서 공유되는 설정을 여기에 작성
-# DB 접속 정보는 각 profile 파일(application-dev/qa/prod.yml)에서 관리
-# 실행 시 profile 지정: --spring.profiles.active=dev (또는 qa, prod)
+# 공통 설정 파일 - 모든 환경에서 공유되는 설정
+# DB 접속 정보 및 외부 API URL 은 각 환경별 파일에서 설정
+#   application-local.yml  (로컬 개발)
+#   application-dev.yml    (개발 서버)
+#   application-qa.yml     (QA 서버)
+#   application-prod.yml   (운영 서버)
+#
+# 처음 사용하는 경우 application-example.yml 을 참고해 위 파일을 만들어주세요.
+# 실행 방법: --spring.profiles.active=local (또는 dev / qa / prod)
 
 spring:
   jpa:

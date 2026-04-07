@@ -1,0 +1,27 @@
+# =====================================================================
+# 환경별 설정 예시 파일 (application-example.yml)
+# =====================================================================
+# 이 파일은 참고용 샘플입니다. Git에 커밋되어 있으며 실제 값은 없습니다.
+#
+# [사용 방법]
+# 1. 이 파일을 복사해서 본인 환경에 맞는 파일명으로 저장하세요.
+#    - 로컬 개발  → application-local.yml
+#    - 개발 서버  → application-dev.yml
+#    - QA 서버    → application-qa.yml
+#    - 운영 서버  → application-prod.yml
+#
+# 2. 복사한 파일에서 아래 예시 값들을 실제 값으로 교체하세요.
+# 3. 해당 파일은 .gitignore 에 등록되어 있으므로 Git에 올라가지 않습니다.
+# =====================================================================
+
+spring:
+  datasource:
+    # DB 서버 주소, 포트, DB명을 실제 환경에 맞게 입력하세요
+    url: jdbc:postgresql://your-db-host:5432/your-db-name
+    username: your-db-username
+    password: your-db-password
+    driver-class-name: org.postgresql.Driver
+
+# 외부 User API 서버 주소 (CreateUser / GrantPoweruser 호출에 사용)
+user-api:
+  base-url: http://your-api-server:8080

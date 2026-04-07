@@ -1,0 +1,6 @@
+# Git에 올라가지 않아야 하는 환경별 설정 파일
+# 각자 로컬에서 application-example.yml 을 참고해 직접 만들어 사용
+src/main/resources/application-local.yml
+src/main/resources/application-dev.yml
+src/main/resources/application-qa.yml
+src/main/resources/application-prod.yml
