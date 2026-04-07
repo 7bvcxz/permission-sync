@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component
 // 외부 보안 시스템과 통신하는 REST API 클라이언트 (DB 접근 없음)
 // 실제 HTTP 호출 구현 시 RestTemplate 또는 WebClient 사용 예정
 @Component
-class SecurityApiClient {
+class UserApiClient {
 
     private val log = LoggerFactory.getLogger(javaClass)
 

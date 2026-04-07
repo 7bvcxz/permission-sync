@@ -1,6 +1,6 @@
 package com.example.permissionsync.service
 
-import com.example.permissionsync.client.SecurityApiClient
+import com.example.permissionsync.client.UserApiClient
 import com.example.permissionsync.model.Employee
 import com.example.permissionsync.repository.EmployeeRepository
 import org.slf4j.LoggerFactory
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service
 @Service
 class EmployeeChangeDetector(
     private val employeeRepository: EmployeeRepository,
-    private val securityApiClient: SecurityApiClient
+    private val userApiClient: UserApiClient
 ) {
     private val log = LoggerFactory.getLogger(javaClass)
 
@@ -66,7 +66,7 @@ class EmployeeChangeDetector(
             // 2 초과 → 외부 API로 사용자 계정 생성 요청
             log.info("EMPLY_NO={} grade digit {} > 2 — calling CreateUser (REST)", employee.emplyNo, gradeDigit)
             try {
-                securityApiClient.createUser(employee)
+                userApiClient.createUser(employee)
                 log.debug("CreateUser completed for EMPLY_NO={}", employee.emplyNo)
             } catch (e: Exception) {
                 log.error("CreateUser failed for EMPLY_NO={}: {}", employee.emplyNo, e.message, e)
@@ -77,7 +77,7 @@ class EmployeeChangeDetector(
             // 7 초과 → 외부 API로 파워유저 권한 부여 요청
             log.info("EMPLY_NO={} grade digit {} > 7 — calling GrantPoweruser (REST)", employee.emplyNo, gradeDigit)
             try {
-                securityApiClient.grantPoweruser(employee)
+                userApiClient.grantPoweruser(employee)
                 log.debug("GrantPoweruser completed for EMPLY_NO={}", employee.emplyNo)
             } catch (e: Exception) {
                 log.error("GrantPoweruser failed for EMPLY_NO={}: {}", employee.emplyNo, e.message, e)
